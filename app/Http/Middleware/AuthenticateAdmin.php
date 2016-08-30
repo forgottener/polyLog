@@ -55,9 +55,11 @@ class AuthenticateAdmin
         $user = Auth::guard('admin')->user();
 
         $currentPermission = AdminPermission::where('name', Route::currentRouteName())->select('id', 'fid')->first();
-        $permissionsList = array_column($table, 'fid', 'id');
-        $newData['current'] = get_fathers_id($permissionsList, $currentPermission->id);
-        $newData['current'][] = $currentPermission->id;
+        if ($currentPermission) {
+            $permissionsList = array_column($table, 'fid', 'id');
+            $newData['current'] = get_fathers_id($permissionsList, $currentPermission->id);
+            $newData['current'][] = $currentPermission->id;
+        }
 
         $permissions = collect([]);
             $user->roles()->with('perms')->get()->pluck('perms')->map(function($item, $key) use (&$permissions){
