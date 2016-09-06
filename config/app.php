@@ -164,6 +164,9 @@ return [
         DaveJamesMiller\Breadcrumbs\ServiceProvider::class,
         Arcanedev\LogViewer\LogViewerServiceProvider::class,
 
+        /*mongodb*/
+        Jenssegers\Mongodb\MongodbServiceProvider::class,
+
     ],
 
     /*

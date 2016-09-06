@@ -11,7 +11,9 @@
         "barryvdh/laravel-debugbar": "^2.2",
         "davejamesmiller/laravel-breadcrumbs": "^3.0",
         "caouecs/laravel-lang": "~3.0",
-        "arcanedev/log-viewer": "~3.0"
+        "arcanedev/log-viewer": "~3.0",
+        "jenssegers/mongodb": "^3.0",
+        "hprose/hprose": ">=2.0.0"
     },
     "require-dev": {
         "fzaninotto/faker": "~1.4",

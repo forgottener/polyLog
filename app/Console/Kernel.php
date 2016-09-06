@@ -14,6 +14,9 @@ class Kernel extends ConsoleKernel
      */
     protected $commands = [
         // Commands\Inspire::class,
+        Commands\SwooleServer::class,
+        Commands\HproseServer::class,
+        Commands\SwooleClient::class,
     ];
 
     /**
