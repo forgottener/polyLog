@@ -1,14 +1,15 @@
 # polyLog
 #### 说明
+
 - 日志统一接收记录管理平台
 - 由于考虑想做成服务化的日志平台,固采用RPC的方式提供方法给各个项目调用,不局限于PHP的项目
 - 管理后台的权限控制已经实现,后台代码来自我的项目[Laravel5.2-AdminLTE-RBAC](https://github.com/forgottener/Laravel5.2-AdminLTE-RBAC)
-- 
+
 #### 环境依赖
 
 - PHP安装swoole扩展
 - mongodb
-- 
+
 #### 使用方式
 
 - 在项目里开启2个artisan命令:
