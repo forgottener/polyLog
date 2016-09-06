@@ -67,15 +67,18 @@ class HproseServer extends Command
         $client = new \swoole_client(SWOOLE_SOCK_TCP);
         //连接到服务器
         if (!$client->connect('127.0.0.1', 9501, 0.5)) {
+            Log::alert("Platform swoole server connect failed");
             throw new \Exception("Platform swoole server connect failed");
         }
         //向服务器发送数据
         if (!$client->send($sendData)) {
+            Log::alert("Platform swoole server send content failed");
             throw new \Exception("Platform swoole server send content failed");
         }
         //从服务器接收数据
         $recv = $client->recv();
         if (!$recv) {
+            Log::alert("Platform swoole server recv failed");
             throw new \Exception("Platform swoole server recv failed");
         }
         //关闭连接

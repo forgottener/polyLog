@@ -4,7 +4,6 @@ namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
 use App\Models\Api\LogDetails;
-use Log;
 
 class SwooleServer extends Command
 {
