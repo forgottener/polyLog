@@ -43,6 +43,10 @@ class SwooleServer extends Command
         //设置异步任务的工作进程
         $serv->set(config('swoole.server.setting'));
 
+        $serv->on('workerstart', function($serv, $id) {
+            $serv->logDetails = new LogDetails();
+        });
+
         $serv->on('receive', function($serv, $fd, $from_id, $data) {
             //投递异步任务
             $serv->task($data);
@@ -53,12 +57,14 @@ class SwooleServer extends Command
         //处理异步任务
         $serv->on('task', function ($serv, $task_id, $from_id, $data) {
             $logDetail = json_decode($data, true);
-            LogDetails::create([
+            $LogDetails = $serv->logDetails;
+            $LogDetails::create([
                 'channel' => isset($logDetail['channel']) ? $logDetail['channel'] : 'default',
                 'level' => isset($logDetail['level']) ? $logDetail['level'] : 0,
                 'level_name' => isset($logDetail['level_name']) ? $logDetail['level_name'] : '',
                 'message' => isset($logDetail['message']) ? $logDetail['message'] : '',
-                'remote' => isset($logDetail['remote']) ? $logDetail['remote'] : '',
+                'remote_ip' => isset($logDetail['remote_ip']) ? $logDetail['remote_ip'] : '',
+                'remote_port' => isset($logDetail['remote_port']) ? $logDetail['remote_port'] : '',
                 'from_id' => $from_id,
                 'task_id' => $task_id,
                 'log_id' => isset($logDetail['log_id']) ? $logDetail['log_id'] : '',

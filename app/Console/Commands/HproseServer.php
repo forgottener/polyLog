@@ -60,7 +60,10 @@ class HproseServer extends Command
             throw new \Exception('日志缺少关键参数channel or message');
         }
         //获取上报服务器client的tcp连接信息
-        $log['remote'] = @stream_socket_get_name($context->socket, true);
+        $remote = @stream_socket_get_name($context->socket, true);
+        if ($remote) {
+            list($log['remote_ip'], $log['remote_port']) = explode(":", $remote);
+        }
         //生成此条日志唯一编号
         $log['log_id'] = md5(generateLogid());
         $sendData = json_encode($log, JSON_UNESCAPED_UNICODE);
