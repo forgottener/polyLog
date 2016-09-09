@@ -7,4 +7,10 @@ class LogDetails extends Moloquent
     protected $connection = 'mongodb';
 
     protected $guarded = [];
+
+    public function delLogs($channel)
+    {
+        //TODO:删除
+        return true;
+    }
 }

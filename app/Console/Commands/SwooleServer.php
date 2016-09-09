@@ -61,7 +61,7 @@ class SwooleServer extends Command
             $LogDetails::create([
                 'channel' => isset($logDetail['channel']) ? $logDetail['channel'] : 'default',
                 'level' => isset($logDetail['level']) ? $logDetail['level'] : 0,
-                'level_name' => isset($logDetail['level_name']) ? $logDetail['level_name'] : '',
+                'level_name' => isset($logDetail['level_name']) ? strtolower($logDetail['level_name']) : '',
                 'message' => isset($logDetail['message']) ? $logDetail['message'] : '',
                 'remote_ip' => isset($logDetail['remote_ip']) ? $logDetail['remote_ip'] : '',
                 'remote_port' => isset($logDetail['remote_port']) ? $logDetail['remote_port'] : '',

@@ -61,4 +61,37 @@ Route::group(['middleware' => ['auth.admin'], 'namespace' => 'Admin', 'prefix' =
     Route::put('user/update', ['as' => 'admin.user.edit', 'uses' => 'UserController@update']); //修改
     Route::post('user/store', ['as' => 'admin.user.create', 'uses' => 'UserController@store']); //添加
 
+    //平台日志路由
+    Route::group(['prefix' => 'platform'], function() {
+        Route::get('index', ['as' => 'admin.platform.index', 'uses' => 'PlatformController@index']);
+        Route::group(['prefix' => 'logs'], function() {
+            Route::get('/', [
+                'as'    => 'admin.platform.logs.list',
+                'uses'  => 'PlatformController@listLogs',
+            ]);
+
+            Route::delete('delete', [
+                'as'    => 'admin.platform.logs.delete',
+                'uses'  => 'PlatformController@delete',
+            ]);
+
+            Route::group(['prefix' => '{channel}'], function() {
+                Route::get('/', [
+                    'as'    => 'admin.platform.logs.show',
+                    'uses'  => 'PlatformController@show',
+                ]);
+
+                Route::get('download', [
+                    'as'    => 'admin.platform.logs.download',
+                    'uses'  => 'PlatformController@download',
+                ]);
+
+                Route::get('{level}', [
+                    'as'    => 'admin.platform.logs.filter',
+                    'uses'  => 'PlatformController@showByLevel',
+                ]);
+            });
+        });
+    });
+
 });

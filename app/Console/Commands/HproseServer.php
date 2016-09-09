@@ -22,6 +22,8 @@ class HproseServer extends Command
      */
     protected $description = 'hprose服务端(RPC)';
 
+    protected $swClient;
+
     /**
      * Create a new command instance.
      *
@@ -40,6 +42,12 @@ class HproseServer extends Command
     public function handle()
     {
         $this->daemonize();
+        $this->swClient = new \swoole_client(SWOOLE_SOCK_TCP | SWOOLE_KEEP);
+        //连接到swoole服务
+        if (!$this->swClient->connect('127.0.0.1', 9501, 0.5)) {
+            Log::alert("Platform swoole server connect failed");
+            throw new \Exception("Platform swoole server connect failed");
+        }
         $server = new Server("tcp://0.0.0.0:1314");
         $server->addFunction([$this, 'swooleClient'], 'polyLog', ["passContext" => true]);
         $server->start();
@@ -67,25 +75,17 @@ class HproseServer extends Command
         //生成此条日志唯一编号
         $log['log_id'] = md5(generateLogid());
         $sendData = json_encode($log, JSON_UNESCAPED_UNICODE);
-        $client = new \swoole_client(SWOOLE_SOCK_TCP);
-        //连接到服务器
-        if (!$client->connect('127.0.0.1', 9501, 0.5)) {
-            Log::alert("Platform swoole server connect failed");
-            throw new \Exception("Platform swoole server connect failed");
-        }
         //向服务器发送数据
-        if (!$client->send($sendData)) {
+        if (!$this->swClient->send($sendData)) {
             Log::alert("Platform swoole server send content failed");
             throw new \Exception("Platform swoole server send content failed");
         }
         //从服务器接收数据
-        $recv = $client->recv();
+        $recv = $this->swClient->recv();
         if (!$recv) {
             Log::alert("Platform swoole server recv failed");
             throw new \Exception("Platform swoole server recv failed");
         }
-        //关闭连接
-        $client->close();
         return $log['log_id'];
     }
 
