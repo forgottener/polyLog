@@ -59,15 +59,13 @@ class SwooleServer extends Command
             $logDetail = json_decode($data, true);
             $LogDetails = $serv->logDetails;
             $LogDetails::create([
+                'log_id' => isset($logDetail['log_id']) ? $logDetail['log_id'] : '',
                 'channel' => isset($logDetail['channel']) ? $logDetail['channel'] : 'default',
-                'level' => isset($logDetail['level']) ? $logDetail['level'] : 0,
                 'level_name' => isset($logDetail['level_name']) ? strtolower($logDetail['level_name']) : 'info',
+                'level' => isset($logDetail['level']) ? $logDetail['level'] : 0,
                 'message' => isset($logDetail['message']) ? $logDetail['message'] : '',
                 'remote_ip' => isset($logDetail['remote_ip']) ? $logDetail['remote_ip'] : '',
                 'remote_port' => isset($logDetail['remote_port']) ? $logDetail['remote_port'] : '',
-                'from_id' => $from_id,
-                'task_id' => $task_id,
-                'log_id' => isset($logDetail['log_id']) ? $logDetail['log_id'] : '',
                 'data' => $data
             ]);
             //返回任务执行的结果
