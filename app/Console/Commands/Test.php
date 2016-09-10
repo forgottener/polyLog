@@ -39,7 +39,7 @@ class Test extends Command
     public function handle()
     {
         $client = new Client('tcp://127.0.0.1:1314', false);
-        $channel = ['laravel', 'thinkphp', 'symfony', 'ci', 'cakephp', 'slim'];
+        $channel = ['laravel', 'thinkphp', 'symfony', 'ci', 'cakephp', 'slim', 'phalcon'];
         $level = ["debug", "info", "notice", "warning", "error", "critical", "alert", "emergency"];
         while (true) {
             $log = Array(

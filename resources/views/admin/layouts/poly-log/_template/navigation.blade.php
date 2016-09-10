@@ -17,6 +17,11 @@
                     <i class="fa fa-dashboard"></i> Dashboard
                 </a>
             </li>
+            <li class="{{ Route::is('admin.platform.all') ? 'active' : '' }}">
+                <a href="{{ route('admin.platform.all') }}">
+                    <i class="fa fa-archive"></i> Statistics
+                </a>
+            </li>
             <li class="{{ Route::is('admin.platform.logs.list') ? 'active' : '' }}">
                 <a href="{{ route('admin.platform.logs.list') }}">
                     <i class="fa fa-archive"></i> Logs

@@ -28,12 +28,42 @@ class PlatformController extends Controller
     {
         $this->perPage = config('log-viewer.per-page', $this->perPage);
     }
+
     /**
-     * 平台日志首页
+     * 首页总日志列表
+     * @param Request $request
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
      */
-    public function index()
+    public function index(Request $request)
     {
+        $logId = $request->input('logId', '');
+        $log = $this->getLogOrFail('', '', $logId);
+        return view('admin.platform.show', compact('log'));
+    }
+
+    /**
+     * 总日志分级别日志列表
+     * @param $level
+     * @param Request $request
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\Http\RedirectResponse|\Illuminate\View\View
+     */
+    public function level($level, Request $request)
+    {
+        if ($level == 'all') {
+            return redirect()->route('admin.platform.index');
+        }
+        $logId = $request->input('logId', '');
+        $log = $this->getLogOrFail('', $level, $logId);
+        return view('admin.platform.show', compact('log'));
+    }
+
+    /**
+     * 平台日志总量展示
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
+    public function all()
+    {
+        //TODO:数据缓存
         $detail = LogDetails::raw()->aggregate([
             [
                 '$group' => [
@@ -44,7 +74,7 @@ class PlatformController extends Controller
         ])->toArray();
         $detail = json_decode(json_encode($detail), true);
         $detail = array_column($detail, 'total', '_id');
-        $detail['all'] = LogDetails::count();
+        $detail['all'] = LogDetails::raw()->count();
 
         $footer = [];
         foreach($this->header as $k => $v) {
@@ -68,7 +98,7 @@ class PlatformController extends Controller
         }
         $reports = json_encode(array_values($json), JSON_PRETTY_PRINT);
 
-        return view('admin.platform.index', compact('reports', 'percents'));
+        return view('admin.platform.all', compact('reports', 'percents'));
     }
 
     /**
@@ -81,6 +111,7 @@ class PlatformController extends Controller
         $page = $request->input('page', 1);
         $offset  = ($page * $this->perPage) - $this->perPage;
         $headers = $this->header;
+        //TODO:数据缓存
         $details = LogDetails::raw()->aggregate([
             [
                 '$group' => [
@@ -198,6 +229,28 @@ class PlatformController extends Controller
     }
 
     /**
+     * 各平台日志列表
+     * @param $channel
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
+    public function show($channel, Request $request)
+    {
+        $logId = $request->input('logId', '');
+        $log = $this->getLogOrFail($channel, '', $logId);
+        return view('admin.platform.show', compact('log'));
+    }
+
+    public function showByLevel($channel, $level, Request $request)
+    {
+        if ($level == 'all') {
+            return redirect()->route('admin.platform.logs.show', [$channel]);
+        }
+        $logId = $request->input('logId', '');
+        $log = $this->getLogOrFail($channel, $level, $logId);
+        return view('admin.platform.show', compact('log'));
+    }
+
+    /**
      * Calculate the percentage
      *
      * @param  array  $total
@@ -220,4 +273,57 @@ class PlatformController extends Controller
 
         return $percents;
     }
+
+    /**
+     * @param string $channel
+     * @param string $level
+     * @param string $logId
+     * @return LogDetails
+     */
+    private function getLogOrFail($channel = '', $level = '', $logId = '')
+    {
+        $log = null;
+
+        try {
+            $logDetails = new LogDetails();
+            if ($logId) {
+                $log = $logDetails->where('log_id', $logId)->paginate($this->perPage);
+            } else {
+                if ($channel) {
+                    $log = $logDetails->where('channel', $channel);
+                } else {
+                    $log = $logDetails;
+                }
+                if ($level) {
+                    $log = $log->where('level_name', $level);
+                }
+                $log = $log->orderBy('_id', 'desc')->paginate($this->perPage);
+            }
+
+            $log->channel = $channel;
+            $log->menu = [];
+            foreach($this->header as $k => $v) {
+                if ($k == 'channel') {
+                    continue;
+                } else {
+                    if ($channel) {
+                        $url = route('admin.platform.logs.filter', [$channel, $k]);
+                    } else {
+                        $url = route('admin.platform.level', [$k]);
+                    }
+                    $log->menu[$k] = [
+                        'name' => $v,
+                        'url' => $url,
+                        'icon' => '<i class="' . config("log-viewer.icons." . $k) . '"></i>'
+                    ];
+                }
+            }
+        }
+        catch(\Exception $e) {
+            abort(404, $e->getMessage());
+        }
+
+        return $log;
+    }
+
 }

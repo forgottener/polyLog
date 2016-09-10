@@ -64,6 +64,8 @@ Route::group(['middleware' => ['auth.admin'], 'namespace' => 'Admin', 'prefix' =
     //平台日志路由
     Route::group(['prefix' => 'platform'], function() {
         Route::get('index', ['as' => 'admin.platform.index', 'uses' => 'PlatformController@index']);
+        Route::get('index/{level}', ['as' => 'admin.platform.level', 'uses' => 'PlatformController@level']);
+        Route::get('all', ['as' => 'admin.platform.all', 'uses' => 'PlatformController@all']);
         Route::group(['prefix' => 'logs'], function() {
             Route::get('/', [
                 'as'    => 'admin.platform.logs.list',
