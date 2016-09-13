@@ -20,19 +20,36 @@ php artisan swoole:server
 php artisan hprose:server
 ```
 
-- 以其他PHP项目为例,在任何PHP项目中,composer引入[hprose/hprose](https://github.com/hprose/hprose-php),日志的内容最好遵循[monolog](https://github.com/Seldaek/monolog/blob/master/doc/01-usage.md)的定义来实现,写个公共的方法调用polyLog/app/Console/Commands/HproseServer.php里写好的方法polyLog即可
+- 以其他PHP项目为例,在任何PHP项目中,composer引入[hprose/hprose](https://github.com/hprose/hprose-php),日志的内容最好遵循[monolog](https://github.com/Seldaek/monolog/blob/master/doc/01-usage.md)的定义来实现,写个公共的方法调用polyLog/app/Console/Commands/HproseServer.php里写好的方法polyLog即可.$log数组的结构请务必参考Monolog的定义来实现,这样方便统计查看.polyLog方法返回唯一的一个`log_id`便于追踪;如果是链路追踪,系统支持在$log中指定log_id.
 
 ```
+<?php
 function platformLog($log)
-    {
-        try {
-            $client = new \Hprose\Socket\Client('tcp://127.0.0.1:1314', false);
-            return $client->polyLog($log);
-        } catch (\Exception $e) {
-            //TODO:需要上报平台日志服务连接不上
-            return true;
-        }
+{
+    try {
+        $client = new \Hprose\Socket\Client('tcp://127.0.0.1:1314', false);
+        return $client->polyLog($log);
+    } catch (\Exception $e) {
+        //TODO:需要上报平台日志服务连接不上
+        return true;
     }
+}
+
+$log = array(
+            "message" => "Exception: wwww in /home/Code/illegal_lumen/app/Http/Controllers/Service/CarSyncController.php:20",
+            "context" => Array(
+                "SERVER_ADDR" => "192.168.56.102"
+            ),
+            "level" => 400,
+            "level_name" => "ERROR",
+            "channel" => "lumen",
+            "extra" => array(
+                "url" => "/illegal/car/sync/3.0",
+                "ip" => "192.168.56.1",
+                "http_method" => "GET",
+            )
+        );
+$log_id = platformLog($log);        
 ```
 - 其他语言项目均只要实现客户端的逻辑来调用polyLog,[hprose](https://github.com/hprose)支持多种语言的
 
