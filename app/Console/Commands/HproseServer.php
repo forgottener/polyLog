@@ -75,8 +75,10 @@ class HproseServer extends Command
         if ($remote) {
             list($log['remote_ip'], $log['remote_port']) = explode(":", $remote);
         }
-        //生成此条日志唯一编号
-        $log['log_id'] = md5(generateLogid());
+        if (!isset($log['log_id']) || empty($log['log_id'])) {
+            //生成此条日志唯一编号
+            $log['log_id'] = md5(generateLogid());
+        }
         $sendData = json_encode($log, JSON_UNESCAPED_UNICODE);
         //向服务器发送数据
         if (!$this->swClient->send($sendData)) {
