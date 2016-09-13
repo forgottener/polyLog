@@ -41,14 +41,17 @@ class HproseServer extends Command
      */
     public function handle()
     {
-        $this->daemonize();
+        //是否开启守护进程
+        if (config('hprose.server.setting.daemonize')) {
+            $this->daemonize();
+        }
         $this->swClient = new \swoole_client(SWOOLE_SOCK_TCP | SWOOLE_KEEP);
         //连接到swoole服务
-        if (!$this->swClient->connect('127.0.0.1', 9501, 0.5)) {
+        if (!$this->swClient->connect(config('swoole.client.host', '127.0.0.1'), config('swoole.client.port', 9501), config('swoole.client.time_out', 1))) {
             Log::alert("Platform swoole server connect failed");
             throw new \Exception("Platform swoole server connect failed");
         }
-        $server = new Server("tcp://0.0.0.0:1314");
+        $server = new Server("tcp://" . config('hprose.server.host', '0.0.0.0') . ":" . config('hprose.server.port', 1314));
         $server->addFunction([$this, 'swooleClient'], 'polyLog', ["passContext" => true]);
         $server->start();
     }
