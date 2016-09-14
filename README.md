@@ -14,13 +14,13 @@
 
 - 在项目里开启2个artisan命令:
 
-```
+```bash
 php artisan swoole:server
 
 php artisan hprose:server
 ```
 
-- 以其他PHP项目为例,在任何PHP项目中,composer引入[hprose/hprose](https://github.com/hprose/hprose-php),日志的内容最好遵循[monolog](https://github.com/Seldaek/monolog/blob/master/doc/01-usage.md)的定义来实现,写个公共的方法调用polyLog/app/Console/Commands/HproseServer.php里写好的方法polyLog即可.$log数组的结构请务必参考Monolog的定义来实现,这样方便统计查看.polyLog方法返回唯一的一个`log_id`便于追踪;如果是链路追踪,系统支持在$log中指定log_id.
+- 以其他PHP项目为例,在任何PHP项目中,composer引入[hprose/hprose](https://github.com/hprose/hprose-php),日志的内容请遵循[Monolog](https://github.com/Seldaek/monolog/blob/master/doc/01-usage.md)的定义来实现,写个公共的方法调用`polyLog/app/Console/Commands/HproseServer.php`里写好的方法`polyLog()`即可. `$log`数组的结构请务必参考Monolog的定义来实现,这样方便统计查看. `polyLog()`方法会返回一个唯一的`log_id`便于追踪; 如果是链路追踪,系统支持在`$log`中指定`log_id`.
 
 ```php
 <?php
@@ -37,7 +37,7 @@ function platformLog($log)
 
 $log = array(
             "message" => "Exception: wwww in /home/Code/illegal_lumen/app/Http/Controllers/Service/CarSyncController.php:20",
-            "context" => Array(
+            "context" => array(
                 "SERVER_ADDR" => "192.168.56.102"
             ),
             "level" => 400,
